@@ -84,9 +84,6 @@ UIKIT_EXTERN NSString * const SLKTextViewPastedItemData;
 /** YES if the text view supports undoing, either using UIMenuController, or with ctrl+z when using an external keyboard. Default is YES. */
 @property (nonatomic, readwrite) BOOL undoManagerEnabled;
 
-/** YES if the font size should dynamically adapt based on the font sizing option preferred by the user. Default is YES. */
-@property (nonatomic, getter=isDynamicTypeEnabled) BOOL dynamicTypeEnabled;
-
 /**
  Some text view properties don't update when it's already firstResponder (auto-correction, spelling-check, etc.)
  To be able to update the text view while still being first responder, requieres to switch quickly from -resignFirstResponder to -becomeFirstResponder.

@@ -73,7 +73,6 @@ static NSString *const SLKTextViewGenericFormattingSelectorPrefix = @"slk_format
 - (void)slk_commonInit
 {
     _pastableMediaTypes = SLKPastableMediaTypeNone;
-    _dynamicTypeEnabled = YES;
 
     self.undoManagerEnabled = YES;
     
@@ -200,19 +199,6 @@ static NSString *const SLKTextViewGenericFormattingSelectorPrefix = @"slk_format
         else if (SLK_IS_IPHONE) {
             numberOfLines /= 2.0; // Half size on larger iPhone
         }
-    }
-    
-    if (self.isDynamicTypeEnabled) {
-        NSString *contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-        CGFloat pointSizeDifference = SLKPointSizeDifferenceForCategory(contentSizeCategory);
-        
-        CGFloat factor = pointSizeDifference/self.initialFontSize;
-        
-        if (fabs(factor) > 0.75) {
-            factor = 0.75;
-        }
-        
-        numberOfLines -= floorf(numberOfLines * factor); // Calculates a dynamic number of lines depending of the user preferred font size
     }
     
     return numberOfLines;
@@ -504,38 +490,10 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 
 - (void)setFont:(UIFont *)font
 {
-    NSString *contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-    
-    [self setFontName:font.fontName pointSize:font.pointSize withContentSizeCategory:contentSizeCategory];
-    
-    self.initialFontSize = font.pointSize;
-}
+    [super setFont:font];
 
-- (void)setFontName:(NSString *)fontName pointSize:(CGFloat)pointSize withContentSizeCategory:(NSString *)contentSizeCategory
-{
-    if (self.isDynamicTypeEnabled) {
-        pointSize += SLKPointSizeDifferenceForCategory(contentSizeCategory);
-    }
-    
-    UIFont *dynamicFont = [UIFont fontWithName:fontName size:pointSize];
-    
-    [super setFont:dynamicFont];
-    
     // Updates the placeholder font too
-    self.placeholderLabel.font = dynamicFont;
-}
-
-- (void)setDynamicTypeEnabled:(BOOL)dynamicTypeEnabled
-{
-    if (self.isDynamicTypeEnabled == dynamicTypeEnabled) {
-        return;
-    }
-    
-    _dynamicTypeEnabled = dynamicTypeEnabled;
-    
-    NSString *contentSizeCategory = [[UIApplication sharedApplication] preferredContentSizeCategory];
-
-    [self setFontName:self.font.fontName pointSize:self.initialFontSize withContentSizeCategory:contentSizeCategory];
+    self.placeholderLabel.font = font;
 }
 
 - (void)setTextAlignment:(NSTextAlignment)textAlignment
@@ -900,19 +858,6 @@ SLKPastableMediaType SLKPastableMediaTypeFromNSString(NSString *string)
 
 - (void)slk_didChangeContentSizeCategory:(NSNotification *)notification
 {
-    if (!self.isDynamicTypeEnabled) {
-        return;
-    }
-    
-    NSString *contentSizeCategory = notification.userInfo[UIContentSizeCategoryNewValueKey];
-    
-    [self setFontName:self.font.fontName pointSize:self.initialFontSize withContentSizeCategory:contentSizeCategory];
-    
-    NSString *text = [self.text copy];
-    
-    // Reloads the content size of the text view
-    [self setText:@" "];
-    [self setText:text];
 }
 
 - (void)slk_willShowMenuController:(NSNotification *)notification
