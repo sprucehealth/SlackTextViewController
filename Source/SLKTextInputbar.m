@@ -634,11 +634,6 @@ NSString * const SLKTextInputbarDidMoveNotification =   @"SLKTextInputbarDidMove
 
 - (void)slk_didChangeContentSizeCategory:(NSNotification *)notification
 {
-    if (!self.textView.isDynamicTypeEnabled) {
-        return;
-    }
-    
-    [self layoutIfNeeded];
 }
 
 
